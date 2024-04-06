@@ -145,7 +145,6 @@ class HomeFragment : Fragment() {
         }
 
         exploreBtn.setOnClickListener {
-            Log.d("afajkff", "afawl,")
             noResultsLayout.visibility = View.GONE
             searchBarET.text.clear()
             searchBarET.clearFocus()
