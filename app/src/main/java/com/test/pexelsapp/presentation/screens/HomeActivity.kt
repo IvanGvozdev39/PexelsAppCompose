@@ -19,9 +19,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,7 +55,6 @@ class HomeActivity : ComponentActivity() {
         setContent {
             var homeTabSelected by remember { mutableStateOf(true) }
             var noResultsVisible by remember { mutableStateOf(false) }
-            val searchBarFocusRequester = remember { FocusRequester() }
 
             var featuredCollections by remember {
                 mutableStateOf(listOf<com.test.domain.models.images.Collection>()) // Change YourCollectionType to the actual type
@@ -122,9 +120,9 @@ class HomeActivity : ComponentActivity() {
 //                                imageRV.scrollToPosition(0)
                             }
                                         },
-                        onSearch = {searchBarFocusRequester.freeFocus()},
+                        onSearch = {},
                         active = false,
-                        onActiveChange = {if (it) searchBarFocusRequester.requestFocus()},
+                        onActiveChange = {},
                         placeholder = { Text(text = stringResource(id = R.string.search)) },
                         colors = SearchBarDefaults.colors(
                             containerColor = colorResource(id = R.color.lighter_gray),
@@ -176,7 +174,6 @@ class HomeActivity : ComponentActivity() {
                                 onClick = {
                                     noResultsVisible = false
                                     searchText = ""
-                                    searchBarFocusRequester.freeFocus()
                                     viewModel.getPopularImages()
                                 },
                                 modifier = Modifier
@@ -298,30 +295,37 @@ class HomeActivity : ComponentActivity() {
     @Composable
     fun ImageItem(photo: Photo, onItemClick: (Photo) -> Unit) {
         val painter = rememberImagePainter(photo.src.original)
+        val imageSize = remember { mutableStateOf(Size.Zero) }
 
-        Box(
-            modifier = Modifier
-                .padding(4.dp)
-                .aspectRatio(1f)
-                .clickable { onItemClick(photo) }
-        ) {
-            Image(
-                painter = painter,
-                contentDescription = null, // content description for screen readers, can be null if image is purely decorative
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop // scale type for the image
-            )
+        BoxWithConstraints {
+            val maxWidth = constraints.maxWidth.toFloat()
+            val imageHeight = (maxWidth / photo.width.toFloat()) * photo.height.toFloat()
+            imageSize.value = Size(maxWidth, imageHeight)
 
-            // If you want to show a placeholder while the image is loading
-            /* if (painter.state is ImagePainter.State.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .align(Alignment.Center)
+            Box(
+                modifier = Modifier
+                    .padding(4.dp)
+                    .aspectRatio(photo.width.toFloat() / photo.height.toFloat())
+                    .clickable { onItemClick(photo) }
+            ) {
+                Image(
+                    painter = painter,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize()
                 )
-            } */
+
+                // If you want to show a placeholder while the image is loading
+                /* if (painter.state is ImagePainter.State.Loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .align(Alignment.Center)
+                    )
+                } */
+            }
         }
     }
+
 
     /*@OptIn(ExperimentalMaterial3Api::class)
     @Composable
