@@ -23,6 +23,7 @@ class HomeViewModel(
 ) : ViewModel() {
 
     var imageList: MutableLiveData<Response<ImageResponse>?> = MutableLiveData()
+    val imagesLoaded = MutableLiveData(false)
     val noNetwork: MutableLiveData<Boolean> = MutableLiveData()
 //    var cleanImageRV: MutableLiveData<Int> = MutableLiveData(0)
 //    var imageListFeaturedCollection: MutableLiveData<Response<CollectionMediaResponse>> = MutableLiveData()
@@ -86,13 +87,13 @@ class HomeViewModel(
         }
     }
 
-
     private fun handleResult(result: com.test.domain.result.Result<ImageResponse>) {
         when (result) {
             is com.test.domain.result.Result.Success -> {
                 val response = Response.success(result.data)
                 imageList.postValue(response)
                 noNetwork.postValue(false)
+                imagesLoaded.postValue(true) // Trigger recomposition
             }
             is com.test.domain.result.Result.Error -> {
                 imageList.postValue(null)

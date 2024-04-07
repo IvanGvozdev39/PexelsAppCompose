@@ -2,16 +2,20 @@ package com.test.pexelsapp.presentation.screens
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
@@ -21,10 +25,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
@@ -52,34 +60,51 @@ class HomeActivity : ComponentActivity() {
         viewModel = ViewModelProvider(this, vmFactory)[HomeViewModel::class.java]
 
         super.onCreate(savedInstanceState)
+
         setContent {
             var homeTabSelected by remember { mutableStateOf(true) }
             var noResultsVisible by remember { mutableStateOf(false) }
 
-            var featuredCollections by remember {
+            var featuredCollectionsData by remember {
                 mutableStateOf(listOf<com.test.domain.models.images.Collection>()) // Change YourCollectionType to the actual type
             }
 
             // Observe the LiveData and update the state when it changes
             viewModel.featuredCollectionNames.observe(this) { collections ->
                 collections?.let {
-                    featuredCollections = it
+                    featuredCollectionsData = it
                 }
             }
 
-            val imageData by remember {
-                mutableStateOf(ArrayList<Photo>()) // Change YourPhotoType to the actual type
+            var imageData by remember {
+                mutableStateOf(ArrayList<Photo>())
             }
 
-            // Observe the LiveData and update the state when it changes
+            var imagesLoaded by remember {
+                mutableStateOf(false)
+            }
+
+            var selectedCollectionIndex by remember { mutableStateOf(-1) }
+
+
+            viewModel.imagesLoaded.observe(this) {
+                imagesLoaded = it
+            }
+
+            LaunchedEffect(selectedCollectionIndex) { // Observe collection selection changes
+                if (selectedCollectionIndex != -1) {
+                    viewModel.getImages(featuredCollectionsData[selectedCollectionIndex].title)
+                }
+            }
+
             viewModel.imageList.observe(this) { response ->
+                Log.d("awawas", "observator triggered")
                 if (response?.isSuccessful == true) {
+                    Log.d("awawas", "response successful")
                     val data = response.body()
                     if (data != null) {
-                        imageData.clear()
-                        imageData.addAll(data.photos)
-                        // Update UI adapter or other UI components
-                        noResultsVisible = data.photos.isEmpty()
+                        Log.d("awawas", data.toString())
+                        imageData = data.photos as ArrayList<Photo> // Update with a new list object
                     }
                 }
             }
@@ -99,27 +124,21 @@ class HomeActivity : ComponentActivity() {
                         mutableStateOf("")
                     }
 
+
                     SearchBar(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(70.dp)
                             .padding(start = 20.dp, end = 20.dp, top = 20.dp),
                         query = searchText,
-                        onQueryChange = {
-                            searchText = it
-                            if (searchText.trim().isEmpty()) {
-//                                searchBarCloseIcon.visibility = View.GONE
-                            } else {
-                                //TODO:
-                                viewModel.getImages(searchText)
-//                                searchBarCloseIcon.visibility = View.VISIBLE
-//                                featuredCollectionsAdapter.resetSelection()
-//                                context?.let { imageRVAdapter.setImageData(ArrayList<Photo>(), it) }
-                                viewModel.getImages(searchText)
-                                lastSearchQuery = searchText
-//                                imageRV.scrollToPosition(0)
+                        onQueryChange = { newQuery ->
+                            searchText = newQuery
+                            if (newQuery.isNotEmpty()) {
+                                viewModel.getImages(newQuery)
+                                lastSearchQuery = newQuery
+                                selectedCollectionIndex = -1
                             }
-                                        },
+                        },
                         onSearch = {},
                         active = false,
                         onActiveChange = {},
@@ -132,12 +151,10 @@ class HomeActivity : ComponentActivity() {
                             )
                         ),
                         leadingIcon = {
-                            if (searchText.length > 0) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_search_red),
-                                    contentDescription = "Search icon"
-                                )
-                            }
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_search_red),
+                                contentDescription = "Search icon"
+                            )
                         },
                         trailingIcon = {
                             if (searchText.length > 0) {
@@ -155,65 +172,105 @@ class HomeActivity : ComponentActivity() {
 
                     Spacer(modifier = Modifier.height(20.dp))
 
+
                     //No results layout
                     if (noResultsVisible) {
-                        Column(
+                        Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight()
-                                .padding(16.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = stringResource(id = R.string.no_results_found),
-                                color = Color.Gray,
-                                fontSize = 15.sp
-                            )
-                            //Explore Button
-                            Button(
-                                onClick = {
-                                    noResultsVisible = false
-                                    searchText = ""
-                                    viewModel.getPopularImages()
-                                },
-                                modifier = Modifier
-                                    .padding(top = 16.dp)
-                                    .fillMaxWidth(),
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = stringResource(id = R.string.explore),
-                                    fontSize = 16.sp,
-                                    textAlign = TextAlign.Center,
-                                    color = Color.Black
+                                    text = stringResource(id = R.string.no_results_found),
+                                    color = Color.Gray,
+                                    fontSize = 16.sp
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                ClickableText(
+                                    text = AnnotatedString.Builder().apply {
+                                        withStyle(
+                                            style = SpanStyle(
+                                                color = Color.Red,
+                                                textDecoration = TextDecoration.Underline,
+                                                fontSize = 16.sp
+                                            )
+                                        ) {
+                                            append(stringResource(id = R.string.explore))
+                                        }
+                                    }.toAnnotatedString(),
+                                    onClick = {
+                                        noResultsVisible = false
+                                        searchText = ""
+                                        viewModel.getPopularImages()
+                                        selectedCollectionIndex = -1
+                                    }
                                 )
                             }
                         }
                     }
 
 
-                    LazyVerticalStaggeredGrid(
-                        columns = StaggeredGridCells.Fixed(2),
-                        contentPadding = PaddingValues(horizontal = 6.dp),
-                        modifier = Modifier.padding(bottom = 65.dp)
-                    ) {
-                        items(imageData) { photo ->
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 6.dp, vertical = 6.dp),
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                ImageItem(photo = photo, onItemClick = {
 
-                                //TODO: Replace with an activity-appropriate intent:
-                                /*val bundle = Bundle().apply {
-                                        putParcelable("photo", photo)
-                                    }*/
-
-                                })
+                    if (featuredCollectionsData.isNotEmpty() && !noResultsVisible) {
+                        LazyRow(
+                            modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 16.dp)
+                        ) {
+                            itemsIndexed(featuredCollectionsData) { index, collection ->
+                                Box(
+                                    modifier = Modifier
+                                        .padding(end = 12.dp)
+                                        .background(
+                                            color = if (index == selectedCollectionIndex) colorResource(
+                                                id = R.color.red
+                                            ) else colorResource(id = R.color.lighter_gray),
+                                            shape = RoundedCornerShape(20.dp)
+                                        )
+                                        .clickable {
+                                            selectedCollectionIndex = index
+                                            viewModel.getImages(collection.title)
+                                            /* Handle click on collection */
+                                        }
+                                ) {
+                                    Text(
+                                        text = collection.title,
+                                        modifier = Modifier.padding(12.dp),
+                                        color = if (index == selectedCollectionIndex) Color.White else Color.Black
+                                    )
+                                }
                             }
                         }
                     }
+
+
+
+
+
+                    if (imagesLoaded) {
+                        LazyVerticalStaggeredGrid(
+                            columns = StaggeredGridCells.Fixed(2),
+                            contentPadding = PaddingValues(horizontal = 6.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(bottom = 55.dp)
+                        ) {
+                            items(imageData) { photo ->
+                                Card(
+                                    modifier = Modifier
+                                        .padding(start = 6.dp, end = 6.dp, bottom = 12.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    ImageItem(photo = photo, onItemClick = {
+                                        //TODO: Replace with an activity-appropriate intent:
+                                        /*val bundle = Bundle().apply {
+                                        putParcelable("photo", photo)
+                                    }*/
+                                    })
+                                }
+                            }
+                        }
+                    }
+
 
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -301,17 +358,20 @@ class HomeActivity : ComponentActivity() {
             val maxWidth = constraints.maxWidth.toFloat()
             val imageHeight = (maxWidth / photo.width.toFloat()) * photo.height.toFloat()
             imageSize.value = Size(maxWidth, imageHeight)
-
             Box(
                 modifier = Modifier
-                    .padding(4.dp)
                     .aspectRatio(photo.width.toFloat() / photo.height.toFloat())
-                    .clickable { onItemClick(photo) }
+                    .background(
+                        Color(android.graphics.Color.parseColor(photo.avg_color)),
+                        RoundedCornerShape(20.dp)
+                    ),
+                contentAlignment = Alignment.Center
             ) {
                 Image(
                     painter = painter,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
                 )
 
                 // If you want to show a placeholder while the image is loading
