@@ -23,7 +23,6 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.request.RequestOptions
 import com.test.domain.models.images.Photo
 import com.test.pexelsapp.R
-import com.test.pexelsapp.app.App
 import com.test.pexelsapp.presentation.viewmodelfactory.DetailsViewModel
 import com.test.pexelsapp.presentation.viewmodelfactory.DetailsViewModelFactory
 import kotlinx.coroutines.launch
@@ -43,7 +42,7 @@ class DetailsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity?.applicationContext as App).appComponent.inject(this)
+//        (activity?.applicationContext as App).appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -68,7 +67,6 @@ class DetailsFragment : Fragment() {
             }
         }
 
-        Log.d("awdwaf", photo!!.url)
         if (photo != null)
             src = photo!!.src.original ?: ""
 

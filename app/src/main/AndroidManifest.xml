@@ -18,7 +18,14 @@
         android:theme="@style/Theme.PexelsApp"
         tools:targetApi="31">
         <activity
-            android:name=".DetailActivity"
+            android:name=".BookmarksActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".presentation.screens.DetailsActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"
@@ -47,7 +54,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".HomeActivity"
+            android:name=".presentation.screens.HomeActivity"
             android:exported="false" />
     </application>
 

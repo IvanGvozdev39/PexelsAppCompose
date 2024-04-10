@@ -1,5 +1,6 @@
 package com.test.pexelsapp.presentation.screens
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.util.Log
@@ -185,7 +186,7 @@ class HomeActivity : ComponentActivity() {
                             ) {
                                 Text(
                                     text = stringResource(id = R.string.no_results_found),
-                                    color = Color.Gray,
+                                    color = colorResource(id = R.color.gray),
                                     fontSize = 16.sp
                                 )
                                 Spacer(modifier = Modifier.height(16.dp))
@@ -193,7 +194,7 @@ class HomeActivity : ComponentActivity() {
                                     text = AnnotatedString.Builder().apply {
                                         withStyle(
                                             style = SpanStyle(
-                                                color = Color.Red,
+                                                color = colorResource(id = R.color.red),
                                                 textDecoration = TextDecoration.Underline,
                                                 fontSize = 16.sp
                                             )
@@ -237,15 +238,14 @@ class HomeActivity : ComponentActivity() {
                                     Text(
                                         text = collection.title,
                                         modifier = Modifier.padding(12.dp),
-                                        color = if (index == selectedCollectionIndex) Color.White else Color.Black
+                                        color = if (index == selectedCollectionIndex) colorResource(
+                                            id = R.color.white
+                                        ) else colorResource(id = R.color.black)
                                     )
                                 }
                             }
                         }
                     }
-
-
-
 
 
                     if (imagesLoaded) {
@@ -258,19 +258,19 @@ class HomeActivity : ComponentActivity() {
                                 Card(
                                     modifier = Modifier
                                         .padding(start = 6.dp, end = 6.dp, bottom = 12.dp),
-                                    shape = RoundedCornerShape(20.dp)
+                                    shape = RoundedCornerShape(20.dp),
+                                    onClick = {
+                                        val intent = Intent(this@HomeActivity, DetailsActivity::class.java)
+                                        intent.putExtra("photo", photo) // Assuming photo is a Photo object
+                                        startActivity(intent)
+                                    }
                                 ) {
                                     ImageItem(photo = photo, onItemClick = {
-                                        //TODO: Replace with an activity-appropriate intent:
-                                        /*val bundle = Bundle().apply {
-                                        putParcelable("photo", photo)
-                                    }*/
                                     })
                                 }
                             }
                         }
                     }
-
 
 
                     Spacer(modifier = Modifier.height(20.dp))
@@ -280,7 +280,7 @@ class HomeActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp)
-                        .background(Color.White)
+                        .background(colorResource(id = R.color.white))
                         .align(Alignment.BottomCenter),
                     verticalAlignment = Alignment.Bottom
                 ) {
@@ -299,7 +299,7 @@ class HomeActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .height(4.dp)
                                         .width(30.dp)
-                                        .background(Color.Red)
+                                        .background(colorResource(id = R.color.red))
                                 )
                             }
                             Spacer(modifier = Modifier.height(10.dp))
@@ -308,7 +308,7 @@ class HomeActivity : ComponentActivity() {
                                 painter = painterResource(id = R.drawable.ic_home_gray),
                                 contentDescription = "Home icon",
                                 tint = if (homeTabSelected) {
-                                    Color.Red
+                                    colorResource(id = R.color.red)
                                 } else colorResource(id = R.color.gray)
                             )
                         }
@@ -329,7 +329,7 @@ class HomeActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .height(4.dp)
                                         .width(30.dp)
-                                        .background(Color.Red)
+                                        .background(colorResource(id = R.color.red))
                                 )
                             }
                             Spacer(modifier = Modifier.height(10.dp))
