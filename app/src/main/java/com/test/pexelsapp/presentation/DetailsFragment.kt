@@ -108,7 +108,7 @@ class DetailsFragment : Fragment() {
             }
         }
 
-        viewModel.imageDownloaded.observe(viewLifecycleOwner) {
+        /*viewModel.imageDownloaded.observe(viewLifecycleOwner) {
             var message = ""
             if (it)
                 message = getString(R.string.downloaded_successfully)
@@ -118,7 +118,7 @@ class DetailsFragment : Fragment() {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
             downloadBtnText.text = getString(R.string.download)
             downloadBtnImage.setImageDrawable(context?.let { it1 -> getDrawable(it1, R.drawable.ic_download) })
-        }
+        }*/
 
         bookmarksBtn = view.findViewById(R.id.bookmarks_button)
         bookmarksBtn.setOnClickListener {

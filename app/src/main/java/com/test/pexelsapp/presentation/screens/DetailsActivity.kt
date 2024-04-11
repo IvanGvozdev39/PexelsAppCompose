@@ -53,7 +53,6 @@ class DetailsActivity : ComponentActivity() {
     lateinit var vmFactory: DetailsViewModelFactory
     private lateinit var viewModel: DetailsViewModel
     private var photo: Photo? = null
-    private var inBookmarks = false
     private lateinit var src: String
 
 
@@ -73,7 +72,7 @@ class DetailsActivity : ComponentActivity() {
 
 
         setContent {
-            var downloadInProcess by remember { mutableStateOf(false) }
+//            var downloadInProcess by remember { mutableStateOf(false) }
             var inBookmarks by remember { mutableStateOf(false) }
 
             if (photo != null) {
@@ -89,20 +88,17 @@ class DetailsActivity : ComponentActivity() {
                 }
             }
 
-            viewModel.imageDownloaded.observe(this) { isDownloaded ->
-                if (isDownloaded) {
-                    // Show a single Toast message
-                    if (isDownloaded)
-                        Toast.makeText(this, getString(R.string.downloaded_successfully), Toast.LENGTH_SHORT).show()
-                    else
-                        Toast.makeText(this, getString(R.string.download_failed), Toast.LENGTH_SHORT).show()
-                } else {
-                    // Show a message or handle download failure
-                }
 
-                // Reset download state
-                downloadInProcess = false
-            }
+            /*viewModel.imageDownloaded.observe(this@DetailsActivity) { downloaded ->
+                if (downloaded) {
+                    if (downloadInProcess) {
+                        downloadInProcess = false
+                        Toast.makeText(this@DetailsActivity, getString(R.string.downloaded_successfully), Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(this@DetailsActivity, getString(R.string.download_failed), Toast.LENGTH_SHORT).show()
+                }
+            }*/
 
 
             Box(
@@ -119,17 +115,16 @@ class DetailsActivity : ComponentActivity() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(65.dp)
-                            .padding(vertical = 10.dp)
+                            .padding(vertical = 10.dp, horizontal = 20.dp)
                     ) {
                         IconButton(
                             onClick = {
                                 onBackPressedDispatcher.onBackPressed()
                             },
                             modifier = Modifier
-                                .size(45.dp)
-                                .padding(start = 20.dp)
+                                .size(35.dp)
                                 .align(Alignment.CenterStart)
-                                .clip(RoundedCornerShape(20.dp))
+                                .clip(RoundedCornerShape(10.dp))
                                 .background(color = colorResource(id = R.color.lighter_gray)),
                             content = {
                                 Image(
@@ -205,9 +200,10 @@ class DetailsActivity : ComponentActivity() {
                             .clip(RoundedCornerShape(50))
                             .background(backgroundColor)
                             .clickable {
-                                if (!downloadInProcess) {
+//                                Log.d("oeadffa", "In the onClick " + downloadInProcess.toString())
+                                if (viewModel.imageDownloaded != 1) {
                                     if (isWriteStoragePermissionGranted()) {
-                                        downloadInProcess = true
+//                                        downloadInProcess = true
                                         viewModel.downloadImage(src)
                                     } else {
                                         // Request WRITE_EXTERNAL_STORAGE permission
@@ -229,7 +225,7 @@ class DetailsActivity : ComponentActivity() {
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_download),
+                                painter = painterResource(id = if (viewModel.imageDownloaded == 1) R.drawable.ic_clock else R.drawable.ic_download),
                                 tint = colorResource(id = R.color.white),
                                 modifier = Modifier.padding(13.dp),
                                 contentDescription = "Download"
@@ -240,7 +236,12 @@ class DetailsActivity : ComponentActivity() {
 
                         // Button text
                         Text(
-                            text = if (!downloadInProcess) stringResource(id = R.string.download) else stringResource(id = R.string.downloading),
+                            text = if (viewModel.imageDownloaded == 1)
+                                stringResource(id = R.string.downloading)
+                            else if (viewModel.imageDownloaded == 2)
+                                stringResource(id = R.string.downloaded)
+                            else
+                                stringResource(id = R.string.download),
                             color = colorResource(id = R.color.black),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically) // Center text vertically
@@ -263,7 +264,7 @@ class DetailsActivity : ComponentActivity() {
                         },
                         modifier = Modifier
                             .size(50.dp)
-                            .padding(end = 20.dp)
+                            .padding(end = 24.dp)
                             .align(Alignment.CenterEnd)
                             .clip(CircleShape)
                             .background(color = colorResource(id = R.color.lighter_gray)),

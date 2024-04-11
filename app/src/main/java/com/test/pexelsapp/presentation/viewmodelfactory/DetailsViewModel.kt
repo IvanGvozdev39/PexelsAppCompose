@@ -8,8 +8,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
@@ -26,23 +28,30 @@ import java.io.FileOutputStream
 import java.io.OutputStream
 
 class DetailsViewModel(private val context: Context) : ViewModel() {
-    private val _imageDownloaded = MutableLiveData<Boolean>()
-    val imageDownloaded: LiveData<Boolean> get() = _imageDownloaded
+    //    private val _imageDownloaded = MutableLiveData<Boolean>()
+    var imageDownloaded by mutableStateOf(0)   //0 - initial; 1 - in process; 2 - downloaded; -1 - failure
+
+    //    val imageDownloaded: LiveData<Boolean> get() = _imageDownloaded
     val db = Room.databaseBuilder(context, PhotoDatabase::class.java, "bookmarks-db").build()
     val photoDao = db.photoDao()
 
     fun downloadImage(imageUrl: String) {
         viewModelScope.launch {
+            imageDownloaded = 1
             try {
                 val byteArray = getImageByteArrayFromUrl(imageUrl)
                 byteArray?.let { data ->
                     val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
                     saveBitmapToStorage(bitmap)
-                    _imageDownloaded.postValue(true) // Notify view that image is downloaded
+                    Log.d("wwafjkawjk", "imageDownloaded true")
+//                    _imageDownloaded.postValue(true) // Notify view that image is downloaded
+                    imageDownloaded = 2
                 }
             } catch (e: Exception) {
-                _imageDownloaded.postValue(false) // Notify view that image download failed
-                // Handle exception
+                Log.d("wwafjkawjk", "error occured imageDownloaded false")
+//                _imageDownloaded.postValue(false) // Notify view that image download failed
+                    imageDownloaded = -1
+            // Handle exception
             }
         }
     }
@@ -141,10 +150,23 @@ class DetailsViewModel(private val context: Context) : ViewModel() {
             val photoList = ArrayList<Photo>()
             if (data != null) {
                 for (image in data) {
-                    photoList.add(Photo(image.alt, image.avgColor, image.height, image.id, image.liked,
-                        image.photographer, image.photographerId, image.photographerUrl,
-                        Src(image.src, image.src, image.src, image.src, image.src, image.src, image.src, image.src),
-                        image.url, image.width))
+                    photoList.add(
+                        Photo(
+                            image.alt, image.avgColor, image.height, image.id, image.liked,
+                            image.photographer, image.photographerId, image.photographerUrl,
+                            Src(
+                                image.src,
+                                image.src,
+                                image.src,
+                                image.src,
+                                image.src,
+                                image.src,
+                                image.src,
+                                image.src
+                            ),
+                            image.url, image.width
+                        )
+                    )
                 }
             }
             photoList

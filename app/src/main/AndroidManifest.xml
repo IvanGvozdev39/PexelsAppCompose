@@ -18,7 +18,7 @@
         android:theme="@style/Theme.PexelsApp"
         tools:targetApi="31">
         <activity
-            android:name=".BookmarksActivity"
+            android:name=".presentation.screens.BookmarksActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

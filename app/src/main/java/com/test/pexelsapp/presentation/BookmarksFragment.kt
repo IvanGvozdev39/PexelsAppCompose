@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.test.pexelsapp.R
-import com.test.pexelsapp.app.App
 import com.test.pexelsapp.presentation.adapters.ImageRVAdapterBookmarks
 import com.test.pexelsapp.presentation.viewmodelfactory.BookmarksViewModel
 import com.test.pexelsapp.presentation.viewmodelfactory.BookmarksViewModelFactory
@@ -39,7 +38,7 @@ class BookmarksFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        (activity?.applicationContext as App).appComponent.inject(this)
+//        (activity?.applicationContext as App).appComponent.inject(this)
     }
 
     override fun onCreateView(
@@ -65,8 +64,7 @@ class BookmarksFragment : Fragment() {
             layoutManager?.onRestoreInstanceState(layoutManagerState)
         }
 
-        viewModel.imageList.observe(viewLifecycleOwner) {
-                val response = it
+        viewModel.imageList.observe(viewLifecycleOwner) { response ->
                 if (response != null) {
                     imageRVAdapter.setImageData(response, context!!)
 //                    imageRV.scrollToPosition(0)

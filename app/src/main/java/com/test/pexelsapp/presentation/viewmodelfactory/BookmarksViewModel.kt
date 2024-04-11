@@ -15,6 +15,7 @@ import kotlinx.coroutines.withContext
 class BookmarksViewModel(private val context: Context) : ViewModel() {
     val db = Room.databaseBuilder(context, PhotoDatabase::class.java, "bookmarks-db").build()
     val photoDao = db.photoDao()
+    val imagesLoaded = MutableLiveData(false)
     var imageList: MutableLiveData<ArrayList<Photo>> = MutableLiveData()
 
     init {

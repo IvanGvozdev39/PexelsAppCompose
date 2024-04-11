@@ -1,6 +1,6 @@
 package com.test.pexelsapp.di
 
-import com.test.pexelsapp.presentation.BookmarksFragment
+import com.test.pexelsapp.presentation.screens.BookmarksActivity
 import com.test.pexelsapp.presentation.screens.DetailsActivity
 import com.test.pexelsapp.presentation.screens.HomeActivity
 import dagger.Component
@@ -10,6 +10,6 @@ interface AppComponent {
 
     fun inject(homeActivity: HomeActivity)
     fun inject(detailsActivity: DetailsActivity)
-    fun inject(bookmarksFragment: BookmarksFragment)
+    fun inject(bookmarksFragment: BookmarksActivity)
 
 }

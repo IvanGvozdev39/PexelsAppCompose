@@ -297,7 +297,7 @@ class HomeActivity : ComponentActivity() {
                             if (homeTabSelected) {
                                 Box(
                                     modifier = Modifier
-                                        .height(4.dp)
+                                        .height(3.dp)
                                         .width(30.dp)
                                         .background(colorResource(id = R.color.red))
                                 )
@@ -316,7 +316,10 @@ class HomeActivity : ComponentActivity() {
 
                     Tab(
                         selected = false,
-                        onClick = { /* Handle tab click */ },
+                        onClick = {
+                            val intent = Intent(this@HomeActivity, BookmarksActivity::class.java)
+                            startActivity(intent)
+                        },
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
@@ -327,7 +330,7 @@ class HomeActivity : ComponentActivity() {
                             if (!homeTabSelected) {
                                 Box(
                                     modifier = Modifier
-                                        .height(4.dp)
+                                        .height(3.dp)
                                         .width(30.dp)
                                         .background(colorResource(id = R.color.red))
                                 )
@@ -336,7 +339,7 @@ class HomeActivity : ComponentActivity() {
                             Icon(
                                 modifier = Modifier.size(30.dp),
                                 painter = painterResource(id = R.drawable.ic_bookmark_gray),
-                                contentDescription = "Home icon",
+                                contentDescription = "Bookmark icon",
                                 tint = if (!homeTabSelected) {
                                     colorResource(id = R.color.red)
                                 } else colorResource(id = R.color.gray)
