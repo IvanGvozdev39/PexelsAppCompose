@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -114,12 +115,12 @@ class HomeActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colorResource(id = R.color.white))
+                    .background(colorResource(id = if (!isSystemInDarkTheme()) R.color.white else R.color.dark_background))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(colorResource(id = R.color.white))
+//                        .background(colorResource(id = R.color.white))
                 ) {
                     var searchText by remember {
                         mutableStateOf("")
@@ -143,18 +144,23 @@ class HomeActivity : ComponentActivity() {
                         onSearch = {},
                         active = false,
                         onActiveChange = {},
-                        placeholder = { Text(text = stringResource(id = R.string.search)) },
+                        placeholder = { Text(text = stringResource(id = R.string.search), color = colorResource(
+                            id = R.color.gray
+                        )) },
                         colors = SearchBarDefaults.colors(
-                            containerColor = colorResource(id = R.color.lighter_gray),
+                            containerColor = colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray),
                             inputFieldColors = TextFieldDefaults.colors(
-                                focusedTextColor = colorResource(id = R.color.black),
+                                cursorColor = colorResource(id = R.color.red),
+                                focusedTextColor = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white),
                                 unfocusedTextColor = colorResource(id = R.color.gray)
-                            )
+                            ),
+                            dividerColor = colorResource(id = R.color.red)
                         ),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_search_red),
-                                contentDescription = "Search icon"
+                                contentDescription = "Search icon",
+                                tint = colorResource(id = R.color.red)
                             )
                         },
                         trailingIcon = {
@@ -164,7 +170,8 @@ class HomeActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_close_red),
-                                        contentDescription = "Clear icon"
+                                        contentDescription = "Clear icon",
+                                        tint = colorResource(id = R.color.red)
                                     )
                                 }
                             }
@@ -226,7 +233,7 @@ class HomeActivity : ComponentActivity() {
                                         .background(
                                             color = if (index == selectedCollectionIndex) colorResource(
                                                 id = R.color.red
-                                            ) else colorResource(id = R.color.lighter_gray),
+                                            ) else colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray),
                                             shape = RoundedCornerShape(20.dp)
                                         )
                                         .clickable {
@@ -240,7 +247,7 @@ class HomeActivity : ComponentActivity() {
                                         modifier = Modifier.padding(12.dp),
                                         color = if (index == selectedCollectionIndex) colorResource(
                                             id = R.color.white
-                                        ) else colorResource(id = R.color.black)
+                                        ) else colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white)
                                     )
                                 }
                             }
@@ -280,7 +287,7 @@ class HomeActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp)
-                        .background(colorResource(id = R.color.white))
+                        .background(colorResource(id = if (!isSystemInDarkTheme()) R.color.white else R.color.dark_background))
                         .align(Alignment.BottomCenter),
                     verticalAlignment = Alignment.Bottom
                 ) {

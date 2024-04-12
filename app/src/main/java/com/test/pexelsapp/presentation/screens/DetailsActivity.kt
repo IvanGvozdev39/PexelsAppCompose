@@ -12,6 +12,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -104,18 +106,17 @@ class DetailsActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colorResource(id = R.color.white))
+                    .background(colorResource(id = if (!isSystemInDarkTheme()) R.color.white else R.color.dark_background))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(colorResource(id = R.color.white))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(65.dp)
-                            .padding(vertical = 10.dp, horizontal = 20.dp)
+                            .padding(vertical = 16.dp, horizontal = 20.dp)
                     ) {
                         IconButton(
                             onClick = {
@@ -125,11 +126,12 @@ class DetailsActivity : ComponentActivity() {
                                 .size(35.dp)
                                 .align(Alignment.CenterStart)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(color = colorResource(id = R.color.lighter_gray)),
+                                .background(color = colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray)),
                             content = {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_back),
-                                    contentDescription = "back"
+                                    contentDescription = "back",
+                                    colorFilter = ColorFilter.tint(color = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white))
                                 )
                             }
                         )
@@ -138,7 +140,8 @@ class DetailsActivity : ComponentActivity() {
                             text = photo?.photographer ?: "",
                             modifier = Modifier
                                 .align(Alignment.Center),
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            color = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white)
                         )
                     }
 
@@ -187,8 +190,8 @@ class DetailsActivity : ComponentActivity() {
                         .align(Alignment.BottomCenter)
                 ) {
                     // Define colors for convenience
-                    val backgroundColor = Color(0xFFE0E0E0) // Lighter gray
-                    val circleColor = Color.Red
+                    val backgroundColor = colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray)
+                    val circleColor = colorResource(id = R.color.red)
 
 
                     Row(
@@ -242,7 +245,7 @@ class DetailsActivity : ComponentActivity() {
                                 stringResource(id = R.string.downloaded)
                             else
                                 stringResource(id = R.string.download),
-                            color = colorResource(id = R.color.black),
+                            color = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white),
                             modifier = Modifier
                                 .align(Alignment.CenterVertically) // Center text vertically
                                 .padding(start = 5.dp)
@@ -267,12 +270,12 @@ class DetailsActivity : ComponentActivity() {
                             .padding(end = 24.dp)
                             .align(Alignment.CenterEnd)
                             .clip(CircleShape)
-                            .background(color = colorResource(id = R.color.lighter_gray)),
+                            .background(color = colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray)),
                         content = {
                             Icon(
                                 painter = painterResource(id = if (!inBookmarks) R.drawable.ic_bookmark else R.drawable.ic_bookmark_added),
                                 contentDescription = "bookmark",
-                                tint = colorResource(id = R.color.black) // Set the color of the bookmark icon
+                                tint = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white)
                             )
                         }
                     )

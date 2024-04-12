@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -82,18 +84,17 @@ class BookmarksActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(colorResource(id = R.color.white))
+                    .background(colorResource(id = if (!isSystemInDarkTheme()) R.color.white else R.color.dark_background))
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(colorResource(id = R.color.white))
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(65.dp)
-                            .padding(vertical = 10.dp, horizontal = 20.dp)
+                            .padding(vertical = 16.dp, horizontal = 20.dp)
                     ) {
                         IconButton(
                             onClick = {
@@ -103,11 +104,12 @@ class BookmarksActivity : ComponentActivity() {
                                 .size(35.dp)
                                 .align(Alignment.CenterStart)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(color = colorResource(id = R.color.lighter_gray)),
+                                .background(color = colorResource(id = if (!isSystemInDarkTheme()) R.color.lighter_gray else R.color.dark_ligther_gray)),
                             content = {
                                 Image(
                                     painter = painterResource(id = R.drawable.ic_back),
-                                    contentDescription = "back"
+                                    contentDescription = "back",
+                                    colorFilter = ColorFilter.tint(color = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white))
                                 )
                             }
                         )
@@ -116,7 +118,8 @@ class BookmarksActivity : ComponentActivity() {
                             text = stringResource(id = R.string.bookmarks),
                             modifier = Modifier
                                 .align(Alignment.Center),
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            color = colorResource(id = if (!isSystemInDarkTheme()) R.color.black else R.color.white)
                         )
                     }
 
@@ -195,7 +198,7 @@ class BookmarksActivity : ComponentActivity() {
                                         ) {
                                             Text(
                                                 text = photo.photographer,
-                                                color = Color.White,
+                                                color = colorResource(id = R.color.white),
                                                 fontSize = 16.sp,
                                                 textAlign = TextAlign.Center,
                                                 modifier = Modifier.fillMaxWidth() // Text can now occupy full Row width
@@ -213,7 +216,7 @@ class BookmarksActivity : ComponentActivity() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(55.dp)
-                        .background(colorResource(id = R.color.white))
+                        .background(colorResource(id = if (!isSystemInDarkTheme()) R.color.white else R.color.dark_background))
                         .align(Alignment.BottomCenter),
                     verticalAlignment = Alignment.Bottom
                 ) {
